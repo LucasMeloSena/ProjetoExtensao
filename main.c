@@ -6,30 +6,23 @@
 
 #define NUM_MAX_CAD 1024
 
-
-typedef struct Pessoa {
+typedef struct Aluno {
     int ocupado;
 	char nome[256];
-	char cpf[13];
 	int idade;
 	char sexo;
-	float salario;
+	char 
+} Aluno;
 
-} Pessoa;
 
-
-Pessoa vetor_pessoas[NUM_MAX_CAD];
+Aluno vetor_pessoas[NUM_MAX_CAD];
 int total_pessoas = 0;
 
 int tela_menu_opcoes();
-
 void tela_cadastrar();
-
 void tela_pesquisar();
 void tela_remover();
-
-void tela_relatorio();
-
+void tela_editar();
 int tela_sair();
 
 
@@ -46,9 +39,7 @@ int main()
         vetor_pessoas[i].ocupado = 0;
     }
 
-
-    do
-    {
+    while (1) {
         opcao = tela_menu_opcoes();
 
         switch(opcao)
@@ -58,24 +49,24 @@ int main()
             break;
             case 2:
                 tela_pesquisar();
-            break
+            break;
             case 3:
                 tela_remover();
             break;
             case 4:
-                tela_relatorio();
-
+                tela_editar();
             break;
             case 5:
                 sair = tela_sair();
-
+                if (sair == 1) {
+                    exit(0);
+                }
             break;
             default:
-                printf("\nOp��o Inv�lida !!! \n");
+                printf("\nOpção Inválida!!! \n");
                 system("pause");
         }
-
-    }while(sair == 0);
+    }
 
     system("cls");
     printf("\nFim da execu��o do programa!\n");
@@ -88,14 +79,14 @@ int tela_menu_opcoes()
     int opcao;
 
     system("cls");
-    printf("Menu de Op��es \n");
+    printf("Menu de Opções \n");
     printf("1 - Cadastrar \n");
     printf("2 - Pesquisar \n");
     printf("3 - Remover \n");
-    printf("4 - Relat�rio \n");
+    printf("4 - Editar \n");
     printf("5 - Sair \n\n");
 
-    printf("Escolha uma op��o: ");
+    printf("Escolha uma opçãoo: ");
     int erro = scanf("%d", &opcao);
 
     if(erro != 1) {
@@ -338,9 +329,9 @@ void tela_pesquisar()
                 printf("ERRO: O CPF deve possuir 11 (onze) d�gitos!\n");
             }
 
-        }while(erro == 1)
+        }while(erro == 1);
 
-        idxPesquisa = -1;
+        int idxPesquisa = -1;
 
         for(int i=0; i<NUM_MAX_CAD; i++){
 
@@ -480,7 +471,7 @@ void tela_remover()
     }while(continuar);
 }
 
-void tela_relatorio()
+void tela_editar()
 {
     system("cls");
     printf("4 - Relat�rio \n\n");
@@ -511,7 +502,7 @@ int tela_sair()
     printf("5 - Sair \n\n");
 
     do{
-        printf("\nDeseja mesmo sair?  (s/n): ");
+        printf("\nDeseja sair?  (s/n): ");
         scanf(" %c", &ch);
 
         fflush(stdin);
