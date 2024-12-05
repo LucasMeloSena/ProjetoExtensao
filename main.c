@@ -9,10 +9,12 @@
 typedef struct
 {
     int ocupado;
+    char matricula[12];
     char nome[256];
     int idade;
     char sexo;
-    char matricula[12]
+    char turma[10];
+    char informacoes[1000];
 } Aluno;
 
 Aluno vetor_alunos[NUM_MAX_CADASTROS];
@@ -21,12 +23,13 @@ char caminho_arquivo_alunos[256];
 
 int tela_menu_opcoes();
 void tela_cadastrar_aluno();
-void tela_pesquisar();
+void tela_pesquisar_alunos();
 void tela_remover();
 void tela_editar();
 int tela_sair();
 void init_arquivo_alunos();
 void salvar_alunos_arquivo();
+void carregar_alunos_arquivo();
 void limpar();
 void pausar();
 
@@ -54,7 +57,7 @@ int main()
             tela_cadastrar_aluno();
             break;
         case 2:
-            tela_pesquisar();
+            tela_pesquisar_alunos();
             break;
         case 3:
             tela_remover();
@@ -113,10 +116,12 @@ void tela_cadastrar_aluno()
     int erro;
     int idxPesquisa = -1;
 
+    char matricula[12];
     char nome[256];
     int idade;
     char sexo, strSexo[3];
-    char matricula[12];
+    char turma[10];
+    char informacoes[1000];
 
     do
     {
@@ -134,23 +139,27 @@ void tela_cadastrar_aluno()
         {
             erro = 0;
 
-            printf("\nDigite a matrícula: ");
+            printf("\n*Digite a matrícula: ");
             scanf(" %11[^\n]", matricula);
             fflush(stdin);
 
+            if (strlen(nome) > 11)
+            {
+                erro = 1;
+                printf("ERRO: A matrícula pode possuir no máximo 11 carracteres!\n");
+            }
             if (strlen(matricula) < 3)
             {
                 erro = 1;
                 printf("ERRO: A matrícula deve possuir pelo menos 3 (três) carracteres!\n");
             }
-
         } while (erro == 1);
 
         do
         {
             erro = 0;
 
-            printf("Digite o nome: ");
+            printf("*Digite o nome: ");
             scanf(" %255[^\n]", nome);
             fflush(stdin);
 
@@ -169,7 +178,7 @@ void tela_cadastrar_aluno()
 
         do
         {
-            printf("Digite a idade: ");
+            printf("*Digite a idade: ");
             erro = scanf("%d", &idade);
 
             fflush(stdin);
@@ -190,7 +199,7 @@ void tela_cadastrar_aluno()
         {
             erro = 0;
 
-            printf("Digite o sexo (M/F): ");
+            printf("*Digite o sexo (M/F): ");
             scanf(" %2[^\n]", strSexo);
             fflush(stdin);
 
@@ -210,8 +219,42 @@ void tela_cadastrar_aluno()
 
         } while (erro == 1);
 
-        idxPesquisa = -1;
+        do
+        {
+            erro = 0;
 
+            printf("*Digite a turma: ");
+            scanf(" %9[^\n]", turma);
+            fflush(stdin);
+
+            if (strlen(turma) > 9)
+            {
+                erro = 1;
+                printf("ERRO: A turma pode possuir no máximo 9 carracteres!\n");
+            }
+            if (strlen(turma) < 1)
+            {
+                erro = 1;
+                printf("ERRO: A turma deve possuir pelo menos 1 carractere!\n");
+            }
+        } while (erro == 1);
+
+        do
+        {
+            erro = 0;
+
+            printf("Digite as informações do aluno: ");
+            scanf(" %999[^\n]", informacoes);
+            fflush(stdin);
+
+            if (strlen(informacoes) > 999)
+            {
+                erro = 1;
+                printf("ERRO: As informações pode possuir no máximo 999 carracteres!\n");
+            }
+        } while (erro == 1);
+
+        idxPesquisa = -1;
         for (int i = 0; i < NUM_MAX_CADASTROS; i++)
         {
             if (vetor_alunos[i].ocupado == 1)
@@ -244,6 +287,8 @@ void tela_cadastrar_aluno()
                     strcpy(vetor_alunos[i].matricula, matricula);
                     vetor_alunos[i].idade = idade;
                     vetor_alunos[i].sexo = sexo;
+                    strcpy(vetor_alunos[i].turma, turma);
+                    strcpy(vetor_alunos[i].informacoes, informacoes);
                     total_alunos = total_alunos + 1;
                     salvar_alunos_arquivo();
 
@@ -279,7 +324,7 @@ void tela_cadastrar_aluno()
     } while (continuar == 1);
 }
 
-void tela_pesquisar()
+void tela_pesquisar_alunos()
 {
     int continuar;
     char ch;
@@ -289,14 +334,13 @@ void tela_pesquisar()
 
     do
     {
-
-        pausar();
-        printf("2 - Pesquisar \n");
-
+        limpar();
+        carregar_alunos_arquivo();
+        printf("-- Menu Pesquisar Alunos -- \n");
         erro = 0;
 
-        printf("\nDigite a matrícula: ");
-        scanf(" %12[^\n]", matricula);
+        printf("\nDigite a matrícula do aluno: ");
+        scanf(" %11[^\n]", matricula);
         fflush(stdin);
 
         int idxPesquisa = -1;
@@ -314,11 +358,13 @@ void tela_pesquisar()
 
         if (idxPesquisa != -1)
         {
-            printf("\Aluno encontrado: \n");
-            printf("Matrícula:     %s\n", vetor_alunos[idxPesquisa].matricula);
-            printf("Nome:    %s\n", vetor_alunos[idxPesquisa].nome);
-            printf("Idade:   %d\n", vetor_alunos[idxPesquisa].idade);
-            printf("Sexo:    %c\n", vetor_alunos[idxPesquisa].sexo);
+            printf("\nAluno encontrado: \n");
+            printf("Matrícula: %s\n", vetor_alunos[idxPesquisa].matricula);
+            printf("Nome: %s\n", vetor_alunos[idxPesquisa].nome);
+            printf("Idade: %d\n", vetor_alunos[idxPesquisa].idade);
+            printf("Sexo: %c\n", vetor_alunos[idxPesquisa].sexo);
+            printf("Turma: %s\n", vetor_alunos[idxPesquisa].turma);
+            printf("Informações: %s\n\n", vetor_alunos[idxPesquisa].informacoes);
             pausar();
         }
         else
@@ -329,13 +375,10 @@ void tela_pesquisar()
 
         do
         {
-
-            printf("\nGostaria de pesquisar outra pessoa?  (s/n): ");
+            printf("Gostaria de pesquisar outra pessoa? (s/n): ");
             scanf(" %c", &ch);
             fflush(stdin);
-
             ch = toupper(ch);
-
         } while (!(ch == 'S' || ch == 'N'));
 
         if (ch == 'S')
@@ -510,7 +553,35 @@ void salvar_alunos_arquivo()
             fprintf(fp, "%s\n", vetor_alunos[i].nome);
             fprintf(fp, "%d\n", vetor_alunos[i].idade);
             fprintf(fp, "%c\n", vetor_alunos[i].sexo);
+            fprintf(fp, "%s\n", vetor_alunos[i].turma);
+            fprintf(fp, "%s\n", vetor_alunos[i].informacoes);
         }
+    }
+    fclose(fp);
+}
+
+void carregar_alunos_arquivo()
+{
+    FILE *fp = fopen(caminho_arquivo_alunos, "r");
+    if (fp == NULL)
+    {
+        printf("Erro ao abrir o arquivo!");
+        exit(EXIT_FAILURE);
+    }
+    fscanf(fp, "%d ", &total_alunos);
+
+    for (int i = 0; i < total_alunos; i++)
+    {
+
+        Aluno aluno;
+        fscanf(fp, "%11[^\n] ", aluno.matricula);
+        fscanf(fp, "%255[^\n] ", aluno.nome);
+        fscanf(fp, "%d ", &aluno.idade);
+        fscanf(fp, "%c ", &aluno.sexo);
+        fscanf(fp, "%9[^\n] ", aluno.turma);
+        fscanf(fp, "%999[^\n] ", aluno.informacoes);
+        aluno.ocupado = 1;
+        vetor_alunos[i] = aluno;
     }
     fclose(fp);
 }
