@@ -65,7 +65,7 @@ int main()
         case 4:
             tela_editar();
             break;
-        case 5:
+        case 6:
             sair = tela_sair();
             if (sair == 1)
             {
@@ -91,11 +91,12 @@ int tela_menu_opcoes()
 
     limpar();
     printf("Menu de Opções \n");
-    printf("1 - Cadastrar \n");
-    printf("2 - Pesquisar \n");
-    printf("3 - Remover \n");
-    printf("4 - Editar \n");
-    printf("5 - Sair \n\n");
+    printf("1 - Cadastrar Aluno\n");
+    printf("2 - Pesquisar Aluno por Matrícula\n");
+    printf("3 - Remover Aluno\n");
+    printf("4 - Editar Aluno\n");
+    printf("5 - Relatório de Alunos Cadastrados\n");
+    printf("6 - Sair \n\n");
 
     printf("Escolha uma opção: ");
     int erro = scanf("%d", &opcao);
@@ -336,7 +337,7 @@ void tela_pesquisar_aluno_by_matricula()
     {
         limpar();
         carregar_alunos_arquivo();
-        printf("-- Menu Pesquisar Alunos -- \n");
+        printf("-- Menu Pesquisar Aluno por Matrícula -- \n");
         erro = 0;
 
         printf("\nDigite a matrícula do aluno: ");
