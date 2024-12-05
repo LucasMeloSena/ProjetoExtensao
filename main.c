@@ -23,7 +23,7 @@ char caminho_arquivo_alunos[256];
 
 int tela_menu_opcoes();
 void tela_cadastrar_aluno();
-void tela_pesquisar_alunos();
+void tela_pesquisar_aluno_by_matricula();
 void tela_remover();
 void tela_editar();
 int tela_sair();
@@ -57,7 +57,7 @@ int main()
             tela_cadastrar_aluno();
             break;
         case 2:
-            tela_pesquisar_alunos();
+            tela_pesquisar_aluno_by_matricula();
             break;
         case 3:
             tela_remover();
@@ -324,7 +324,7 @@ void tela_cadastrar_aluno()
     } while (continuar == 1);
 }
 
-void tela_pesquisar_alunos()
+void tela_pesquisar_aluno_by_matricula()
 {
     int continuar;
     char ch;
@@ -344,7 +344,7 @@ void tela_pesquisar_alunos()
         fflush(stdin);
 
         int idxPesquisa = -1;
-        for (int i = 0; i < NUM_MAX_CADASTROS; i++)
+        for (int i = 0; i < total_alunos; i++)
         {
             if (vetor_alunos[i].ocupado == 1)
             {
@@ -519,7 +519,7 @@ int tela_sair()
 
 void init_arquivo_alunos()
 {
-    strcpy(caminho_arquivo_alunos, "cadastro_alunos.txt");
+    strcpy(caminho_arquivo_alunos, "alunos.txt");
     FILE *fp = fopen(caminho_arquivo_alunos, "r");
 
     if (fp == NULL)
@@ -572,7 +572,6 @@ void carregar_alunos_arquivo()
 
     for (int i = 0; i < total_alunos; i++)
     {
-
         Aluno aluno;
         fscanf(fp, "%11[^\n] ", aluno.matricula);
         fscanf(fp, "%255[^\n] ", aluno.nome);
