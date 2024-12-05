@@ -17,13 +17,16 @@ typedef struct
 
 Aluno vetor_alunos[NUM_MAX_CADASTROS];
 int total_alunos = 0;
+char caminho_arquivo_alunos[256];
 
 int tela_menu_opcoes();
-void tela_cadastrar();
+void tela_cadastrar_aluno();
 void tela_pesquisar();
 void tela_remover();
 void tela_editar();
 int tela_sair();
+void init_arquivo_alunos();
+void salvar_alunos_arquivo();
 void limpar();
 void pausar();
 
@@ -31,6 +34,7 @@ int main()
 {
     setlocale(LC_ALL, "portuguese");
     system("chcp 1252 > null");
+    init_arquivo_alunos();
 
     int sair = 0;
     int opcao;
@@ -47,7 +51,7 @@ int main()
         switch (opcao)
         {
         case 1:
-            tela_cadastrar();
+            tela_cadastrar_aluno();
             break;
         case 2:
             tela_pesquisar();
@@ -62,6 +66,7 @@ int main()
             sair = tela_sair();
             if (sair == 1)
             {
+                printf("\nPrograma encerrado com sucesso!");
                 exit(0);
             }
             break;
@@ -72,7 +77,7 @@ int main()
     }
 
     limpar();
-    printf("\nFim da execu��o do programa!\n");
+    printf("\nFim da execução do programa!\n");
 
     return 0;
 }
@@ -89,7 +94,7 @@ int tela_menu_opcoes()
     printf("4 - Editar \n");
     printf("5 - Sair \n\n");
 
-    printf("Escolha uma opçãoo: ");
+    printf("Escolha uma opção: ");
     int erro = scanf("%d", &opcao);
 
     if (erro != 1)
@@ -101,7 +106,7 @@ int tela_menu_opcoes()
     return opcao;
 }
 
-void tela_cadastrar()
+void tela_cadastrar_aluno()
 {
     int continuar;
     char ch;
@@ -116,7 +121,7 @@ void tela_cadastrar()
     do
     {
         limpar();
-        printf("1 - Cadastrar \n");
+        printf("-- Menu Cadastrar -- \n");
 
         if (total_alunos >= NUM_MAX_CADASTROS)
         {
@@ -129,7 +134,23 @@ void tela_cadastrar()
         {
             erro = 0;
 
-            printf("\nDigite o nome: ");
+            printf("\nDigite a matrícula: ");
+            scanf(" %11[^\n]", matricula);
+            fflush(stdin);
+
+            if (strlen(matricula) < 3)
+            {
+                erro = 1;
+                printf("ERRO: A matrícula deve possuir pelo menos 3 (três) carracteres!\n");
+            }
+
+        } while (erro == 1);
+
+        do
+        {
+            erro = 0;
+
+            printf("Digite o nome: ");
             scanf(" %255[^\n]", nome);
             fflush(stdin);
 
@@ -148,7 +169,7 @@ void tela_cadastrar()
 
         do
         {
-            printf("\nDigite a idade: ");
+            printf("Digite a idade: ");
             erro = scanf("%d", &idade);
 
             fflush(stdin);
@@ -169,7 +190,7 @@ void tela_cadastrar()
         {
             erro = 0;
 
-            printf("\nDigite o sexo (M / F): ");
+            printf("Digite o sexo (M/F): ");
             scanf(" %2[^\n]", strSexo);
             fflush(stdin);
 
@@ -224,6 +245,7 @@ void tela_cadastrar()
                     vetor_alunos[i].idade = idade;
                     vetor_alunos[i].sexo = sexo;
                     total_alunos = total_alunos + 1;
+                    salvar_alunos_arquivo();
 
                     printf("\nDados cadastrados com sucesso! \n");
                     pausar();
@@ -427,11 +449,11 @@ int tela_sair()
 
     int sair;
     limpar();
-    printf("5 - Sair \n\n");
+    printf("---- Menu Sair ---- \n");
 
     do
     {
-        printf("\nDeseja sair?  (s/n): ");
+        printf("\nDeseja sair? (s/n): ");
         scanf(" %c", &ch);
 
         fflush(stdin);
@@ -450,6 +472,47 @@ int tela_sair()
     } while (!(ch == 'S' || ch == 'N'));
 
     return sair;
+}
+
+void init_arquivo_alunos()
+{
+    strcpy(caminho_arquivo_alunos, "cadastro_alunos.txt");
+    FILE *fp = fopen(caminho_arquivo_alunos, "r");
+
+    if (fp == NULL)
+    {
+        fp = fopen(caminho_arquivo_alunos, "w");
+        fprintf(fp, "%d\n", total_alunos);
+        fclose(fp);
+    }
+    else
+    {
+        fclose(fp);
+    }
+}
+
+void salvar_alunos_arquivo()
+{
+    FILE *fp = fopen(caminho_arquivo_alunos, "w");
+
+    if (fp == NULL)
+    {
+        printf("Erro ao abrir o arquivo!");
+        exit(EXIT_FAILURE);
+    }
+    fprintf(fp, "%d\n", total_alunos);
+
+    for (int i = 0; i < NUM_MAX_CADASTROS; i++)
+    {
+        if (vetor_alunos[i].ocupado == 1)
+        {
+            fprintf(fp, "%s\n", vetor_alunos[i].matricula);
+            fprintf(fp, "%s\n", vetor_alunos[i].nome);
+            fprintf(fp, "%d\n", vetor_alunos[i].idade);
+            fprintf(fp, "%c\n", vetor_alunos[i].sexo);
+        }
+    }
+    fclose(fp);
 }
 
 void limpar()
