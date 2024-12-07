@@ -77,6 +77,7 @@ void tela_cadastrar_aluno();
 void tela_pesquisar_aluno_by_matricula();
 void tela_remover();
 void tela_editar();
+void tela_relatorio();
 void init_arquivo_alunos();
 void salvar_alunos_arquivo();
 void carregar_alunos_arquivo();
@@ -137,6 +138,9 @@ int main()
                     break;
                 case 4:
                     tela_editar();
+                    break;
+                case 5:
+                    tela_relatorio();
                     break;
                 case 6:
                     break;
@@ -762,14 +766,15 @@ void tela_remover()
 
 void tela_editar()
 {
+    pausar();
 }
 
 void tela_relatorio()
 {
     limpar();
+    carregar_alunos_arquivo();
+    pausar();
     printf("-- Menu Relatório Alunos -- \n\n");
-
-    printf("Total de Alunos Cadastrados: %d\n\n", total_alunos);
 
     for (int i = 0; i < NUM_MAX_CADASTROS_ALUNOS; i++)
     {
@@ -779,6 +784,8 @@ void tela_relatorio()
             printf("Nome: %s\n", vetor_alunos[i].nome);
             printf("Idade: %d\n", vetor_alunos[i].idade);
             printf("Sexo: %c\n", vetor_alunos[i].sexo);
+            printf("Turma: %s\n", vetor_alunos[i].turma);
+            printf("Informações: %s\n\n", vetor_alunos[i].informacoes);
         }
     }
 
