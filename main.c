@@ -78,11 +78,11 @@ void tela_cadastrar_aluno();
 void tela_pesquisar_aluno_by_matricula();
 void tela_relatorio_alunos();
 void tela_remover_aluno();
-void tela_editar();
+void tela_editar_aluno();
 void salvar_aluno_arquivo();
 void carregar_alunos_arquivo();
 void remover_aluno_arquivo(char matricula[]);
-void editar_aluno_arquivo(char matricula[]);
+void editar_aluno_arquivo(Aluno aluno_atualizado);
 void init_arquivo_admin();
 void salvar_admin_arquivo();
 void carregar_admin_arquivo();
@@ -138,7 +138,7 @@ int main()
                     tela_remover_aluno();
                     break;
                 case 4:
-                    tela_editar();
+                    tela_editar_aluno();
                     break;
                 case 5:
                     tela_relatorio_alunos();
@@ -153,7 +153,7 @@ int main()
             }
             break;
         case 2:
-            // tela_login_admin();
+            // tela
             break;
         case 3:
             sair = tela_sair();
@@ -650,14 +650,14 @@ void tela_pesquisar_aluno_by_matricula()
         int idxPesquisa = -1;
         for (int i = 0; i < total_alunos; i++)
         {
-            // if (vetor_alunos[i].ocupado == 1)
-            // {
-            if (strcmp(vetor_alunos[i].matricula, matricula) == 0)
+            if (vetor_alunos[i].ocupado == 1)
             {
-                idxPesquisa = i;
-                break;
+                if (strcmp(vetor_alunos[i].matricula, matricula) == 0)
+                {
+                    idxPesquisa = i;
+                    break;
+                }
             }
-            //}
         }
 
         if (idxPesquisa != -1)
@@ -764,8 +764,164 @@ void tela_remover_aluno()
     } while (continuar);
 }
 
-void tela_editar()
+void tela_editar_aluno()
 {
+    int idxPesquisa = -1;
+    char matricula[12];
+
+    limpar();
+    carregar_alunos_arquivo();
+    printf("-- Menu Atualizar Aluno -- \n");
+
+    printf("\nDigite a matrícula do aluno: ");
+    scanf(" %11[^\n]", matricula);
+    fflush(stdin);
+
+    for (int i = 0; i < total_alunos; i++)
+    {
+        if (vetor_alunos[i].ocupado == 1)
+        {
+            if (strcmp(vetor_alunos[i].matricula, matricula) == 0)
+            {
+                idxPesquisa = i;
+                break;
+            }
+        }
+    }
+
+    if (idxPesquisa != -1)
+    {
+        printf("\nAluno encontrado: \n");
+        printf("Matrícula: %s\n", vetor_alunos[idxPesquisa].matricula);
+        printf("Nome: %s\n", vetor_alunos[idxPesquisa].nome);
+        printf("Idade: %d\n", vetor_alunos[idxPesquisa].idade);
+        printf("Sexo: %c\n", vetor_alunos[idxPesquisa].sexo);
+        printf("Turma: %s\n", vetor_alunos[idxPesquisa].turma);
+        printf("Informações: %s\n\n", vetor_alunos[idxPesquisa].informacoes);
+    }
+    else
+    {
+        printf("\nNão foi encontrado um aluno com a matrícula informada!\n\n");
+        pausar();
+    }
+
+    int erro;
+    char nome[256];
+    int idade;
+    char sexo, strSexo[3];
+    char turma[10];
+    char informacoes[1000];
+
+    do
+    {
+        erro = 0;
+
+        printf("*Digite o nome: ");
+        scanf(" %255[^\n]", nome);
+        fflush(stdin);
+
+        if (strlen(nome) > 254)
+        {
+            erro = 1;
+            printf("ERRO: O nome pode possuir no máximo 254 carracteres!\n");
+        }
+        if (strlen(nome) < 3)
+        {
+            erro = 1;
+            printf("ERRO: O nome deve possuir pelo menos 3 (três) carracteres!\n");
+        }
+
+    } while (erro == 1);
+
+    do
+    {
+        printf("*Digite a idade: ");
+        erro = scanf("%d", &idade);
+
+        fflush(stdin);
+
+        if (erro != 1)
+        {
+            printf("ERRO: Digite um valor inteiro válido!\n");
+        }
+        else if (idade < 1 || idade > 20)
+        {
+            erro = -1;
+            printf("ERRO: A idade deve estar entre 1 e 20 anos!\n");
+        }
+
+    } while (erro != 1);
+
+    do
+    {
+        erro = 0;
+
+        printf("*Digite o sexo (M/F): ");
+        scanf(" %2[^\n]", strSexo);
+        fflush(stdin);
+
+        if (strlen(strSexo) == 1)
+        {
+            sexo = toupper(strSexo[0]);
+        }
+        else
+        {
+            erro = 1;
+        }
+        if (!(sexo == 'M' || sexo == 'F') || erro == 1)
+        {
+            erro = 1;
+            printf("ERRO: São aceitos apenas os valores 'M' ou 'F'!\n");
+        }
+
+    } while (erro == 1);
+
+    do
+    {
+        erro = 0;
+
+        printf("*Digite a turma: ");
+        scanf(" %9[^\n]", turma);
+        fflush(stdin);
+
+        if (strlen(turma) > 9)
+        {
+            erro = 1;
+            printf("ERRO: A turma pode possuir no máximo 9 carracteres!\n");
+        }
+        if (strlen(turma) < 1)
+        {
+            erro = 1;
+            printf("ERRO: A turma deve possuir pelo menos 1 carractere!\n");
+        }
+    } while (erro == 1);
+
+    do
+    {
+        erro = 0;
+
+        printf("Digite as informações do aluno: ");
+        scanf(" %999[^\n]", informacoes);
+        fflush(stdin);
+
+        if (strlen(informacoes) > 999)
+        {
+            erro = 1;
+            printf("ERRO: As informações pode possuir no máximo 999 carracteres!\n");
+        }
+    } while (erro == 1);
+
+    Aluno aluno;
+    aluno.ocupado = 1;
+    strcpy(aluno.nome, nome);
+    strcpy(aluno.matricula, matricula);
+    aluno.idade = idade;
+    aluno.sexo = sexo;
+    strcpy(aluno.turma, turma);
+    strcpy(aluno.informacoes, informacoes);
+    editar_aluno_arquivo(aluno);
+
+    printf("\nAluno atualizado com sucesso! \n");
     pausar();
 }
 
@@ -823,6 +979,7 @@ int tela_sair()
     return sair;
 }
 
+// CRUD Alunos
 void salvar_aluno_arquivo()
 {
     FILE *fp = fopen(caminho_arquivo_alunos, "wb");
@@ -902,6 +1059,46 @@ void remover_aluno_arquivo(char matricula[])
     fclose(fp_total);
 }
 
+void editar_aluno_arquivo(Aluno aluno)
+{
+    FILE *fp = fopen(caminho_arquivo_alunos, "rb+");
+    FILE *fp_total = fopen(caminho_arquivo_total_alunos, "rb+");
+
+    if (fp == NULL || fp_total == NULL)
+    {
+        printf("Erro ao abrir o arquivo!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    int encontrado = 0;
+    for (int i = 0; i < NUM_MAX_CADASTROS_ALUNOS; i++)
+    {
+        if (strcmp(vetor_alunos[i].matricula, aluno.matricula) == 0 && vetor_alunos[i].ocupado != 0)
+        {
+            vetor_alunos[i] = aluno;
+            encontrado = 1;
+            break;
+        }
+    }
+
+    if (!encontrado)
+    {
+        printf("Aluno com matrícula %s não encontrado.\n", aluno.matricula);
+        fclose(fp);
+        fclose(fp_total);
+        return;
+    }
+
+    fseek(fp, 0, SEEK_SET);
+    fwrite(vetor_alunos, sizeof(Aluno), NUM_MAX_CADASTROS_ALUNOS, fp);
+    fseek(fp_total, 0, SEEK_SET);
+    fwrite(&total_alunos, sizeof(int), 1, fp_total);
+
+    fclose(fp);
+    fclose(fp_total);
+}
+
+// CRUD Admin
 void init_arquivo_admin()
 {
     strcpy(caminho_arquivo_admin, "admin.txt");
