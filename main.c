@@ -55,7 +55,8 @@ int total_admin = 0;
 int total_alunos = 0;
 int total_cuidadores = 0;
 int total_observacoes = 0;
-char caminho_arquivo_alunos[256];
+char caminho_arquivo_total_alunos[256] = "./total_alunos.dat";
+char caminho_arquivo_alunos[256] = "./alunos.dat";
 char caminho_arquivo_admin[256];
 char caminho_arquivo_cuidadores[256];
 char caminho_arquivo_observacoes[256];
@@ -75,12 +76,13 @@ int tela_menu_opcoes_cuidador();
 // Telas admin:
 void tela_cadastrar_aluno();
 void tela_pesquisar_aluno_by_matricula();
-void tela_remover();
+void tela_relatorio_alunos();
+void tela_remover_aluno();
 void tela_editar();
-void tela_relatorio();
-void init_arquivo_alunos();
-void salvar_alunos_arquivo();
+void salvar_aluno_arquivo();
 void carregar_alunos_arquivo();
+void remover_aluno_arquivo(char matricula[]);
+void editar_aluno_arquivo(char matricula[]);
 void init_arquivo_admin();
 void salvar_admin_arquivo();
 void carregar_admin_arquivo();
@@ -95,7 +97,6 @@ int main()
     setlocale(LC_ALL, "portuguese");
     system("chcp 1252 > null");
     init_arquivo_admin();
-    init_arquivo_alunos();
 
     int sair = 0;
     int opcao;
@@ -134,13 +135,13 @@ int main()
                     tela_pesquisar_aluno_by_matricula();
                     break;
                 case 3:
-                    tela_remover();
+                    tela_remover_aluno();
                     break;
                 case 4:
                     tela_editar();
                     break;
                 case 5:
-                    tela_relatorio();
+                    tela_relatorio_alunos();
                     break;
                 case 6:
                     break;
@@ -425,6 +426,7 @@ void tela_cadastrar_aluno()
     char sexo, strSexo[3];
     char turma[10];
     char informacoes[1000];
+    int ocupado;
 
     do
     {
@@ -585,7 +587,6 @@ void tela_cadastrar_aluno()
                 if (vetor_alunos[i].ocupado == 0)
                 {
                     vetor_alunos[i].ocupado = 1;
-
                     strcpy(vetor_alunos[i].nome, nome);
                     strcpy(vetor_alunos[i].matricula, matricula);
                     vetor_alunos[i].idade = idade;
@@ -593,7 +594,7 @@ void tela_cadastrar_aluno()
                     strcpy(vetor_alunos[i].turma, turma);
                     strcpy(vetor_alunos[i].informacoes, informacoes);
                     total_alunos = total_alunos + 1;
-                    salvar_alunos_arquivo();
+                    salvar_aluno_arquivo();
 
                     printf("\nDados cadastrados com sucesso! \n");
                     pausar();
@@ -649,14 +650,14 @@ void tela_pesquisar_aluno_by_matricula()
         int idxPesquisa = -1;
         for (int i = 0; i < total_alunos; i++)
         {
-            if (vetor_alunos[i].ocupado == 1)
+            // if (vetor_alunos[i].ocupado == 1)
+            // {
+            if (strcmp(vetor_alunos[i].matricula, matricula) == 0)
             {
-                if (strcmp(vetor_alunos[i].matricula, matricula) == 0)
-                {
-                    idxPesquisa = i;
-                    break;
-                }
+                idxPesquisa = i;
+                break;
             }
+            //}
         }
 
         if (idxPesquisa != -1)
@@ -696,7 +697,7 @@ void tela_pesquisar_aluno_by_matricula()
     } while (continuar == 1);
 }
 
-void tela_remover()
+void tela_remover_aluno()
 {
     int continuar;
     char ch;
@@ -707,7 +708,8 @@ void tela_remover()
     do
     {
         limpar();
-        printf("3 - Remover \n\n");
+        carregar_alunos_arquivo();
+        printf("-- Menu Remover Aluno --\n");
 
         erro = 0;
         printf("\nDigite a matrícula: ");
@@ -721,10 +723,9 @@ void tela_remover()
             {
                 if (strcmp(vetor_alunos[i].matricula, matricula) == 0)
                 {
-                    total_alunos = total_alunos - 1;
                     vetor_alunos[i].ocupado = 0;
                     idxPesquisa = i;
-
+                    remover_aluno_arquivo(vetor_alunos[i].matricula);
                     break;
                 }
             }
@@ -732,18 +733,18 @@ void tela_remover()
 
         if (idxPesquisa != -1)
         {
-            printf("\Aluno removido com sucesso!\n");
+            printf("\nAluno removido com sucesso!\n");
         }
         else
         {
-            printf("\nNão foi possível remover a pessoa do cadastro!\n");
+            printf("\nNão foi possível remover o aluno!\n");
         }
         pausar();
 
         do
         {
 
-            printf("\nGostaria de remover outra pessoa?  (s/n): ");
+            printf("\nGostaria de remover outro aluno? (s/n): ");
             scanf(" %c", &ch);
 
             fflush(stdin);
@@ -760,7 +761,6 @@ void tela_remover()
         {
             continuar = 0;
         }
-
     } while (continuar);
 }
 
@@ -769,7 +769,7 @@ void tela_editar()
     pausar();
 }
 
-void tela_relatorio()
+void tela_relatorio_alunos()
 {
     limpar();
     carregar_alunos_arquivo();
@@ -823,72 +823,83 @@ int tela_sair()
     return sair;
 }
 
-void init_arquivo_alunos()
+void salvar_aluno_arquivo()
 {
-    strcpy(caminho_arquivo_alunos, "alunos.txt");
-    FILE *fp = fopen(caminho_arquivo_alunos, "r");
-
-    if (fp == NULL)
-    {
-        fp = fopen(caminho_arquivo_alunos, "w");
-        fprintf(fp, "%d\n", total_alunos);
-        fclose(fp);
-    }
-    else
-    {
-        fclose(fp);
-    }
-}
-
-void salvar_alunos_arquivo()
-{
-    FILE *fp = fopen(caminho_arquivo_alunos, "w");
+    FILE *fp = fopen(caminho_arquivo_alunos, "wb");
+    FILE *fp_total = fopen(caminho_arquivo_total_alunos, "wb");
 
     if (fp == NULL)
     {
         printf("Erro ao abrir o arquivo!");
         exit(EXIT_FAILURE);
     }
-    fprintf(fp, "%d\n", total_alunos);
+    fwrite(vetor_alunos, sizeof(Aluno), 1, fp);
+    fwrite(&total_alunos, sizeof(int), 1, fp_total);
 
-    for (int i = 0; i < NUM_MAX_CADASTROS_ALUNOS; i++)
-    {
-        if (vetor_alunos[i].ocupado == 1)
-        {
-            fprintf(fp, "%s\n", vetor_alunos[i].matricula);
-            fprintf(fp, "%s\n", vetor_alunos[i].nome);
-            fprintf(fp, "%d\n", vetor_alunos[i].idade);
-            fprintf(fp, "%c\n", vetor_alunos[i].sexo);
-            fprintf(fp, "%s\n", vetor_alunos[i].turma);
-            fprintf(fp, "%s\n", vetor_alunos[i].informacoes);
-        }
-    }
     fclose(fp);
+    fclose(fp_total);
 }
 
 void carregar_alunos_arquivo()
 {
-    FILE *fp = fopen(caminho_arquivo_alunos, "r");
+    FILE *fp = fopen(caminho_arquivo_alunos, "rb");
+    FILE *fp_total = fopen(caminho_arquivo_total_alunos, "rb");
+
     if (fp == NULL)
     {
         printf("Erro ao abrir o arquivo!");
         exit(EXIT_FAILURE);
     }
-    fscanf(fp, "%d ", &total_alunos);
 
-    for (int i = 0; i < total_alunos; i++)
-    {
-        Aluno aluno;
-        fscanf(fp, "%11[^\n] ", aluno.matricula);
-        fscanf(fp, "%255[^\n] ", aluno.nome);
-        fscanf(fp, "%d ", &aluno.idade);
-        fscanf(fp, "%c ", &aluno.sexo);
-        fscanf(fp, "%9[^\n] ", aluno.turma);
-        fscanf(fp, "%999[^\n] ", aluno.informacoes);
-        aluno.ocupado = 1;
-        vetor_alunos[i] = aluno;
-    }
+    fread(vetor_alunos, sizeof(Aluno), 1, fp);
+    fread(&total_alunos, sizeof(int), 1, fp_total);
+
     fclose(fp);
+    fclose(fp_total);
+}
+
+void remover_aluno_arquivo(char matricula[])
+{
+    FILE *fp = fopen(caminho_arquivo_alunos, "rb+");
+    FILE *fp_total = fopen(caminho_arquivo_total_alunos, "rb+");
+
+    if (fp == NULL || fp_total == NULL)
+    {
+        printf("Erro ao abrir o arquivo!\n");
+        exit(EXIT_FAILURE);
+    }
+
+    fread(&total_alunos, sizeof(int), 1, fp_total);
+    fread(vetor_alunos, sizeof(Aluno), NUM_MAX_CADASTROS_ALUNOS, fp);
+
+    int encontrado = 0;
+    for (int i = 0; i < NUM_MAX_CADASTROS_ALUNOS; i++)
+    {
+        if (vetor_alunos[i].matricula == matricula && vetor_alunos[i].ocupado != 0)
+        {
+            vetor_alunos[i].ocupado = 0;
+            encontrado = 1;
+            break;
+        }
+    }
+
+    if (!encontrado)
+    {
+        printf("Aluno com matrícula %d não encontrado.\n", matricula);
+        fclose(fp);
+        fclose(fp_total);
+        return;
+    }
+
+    total_alunos--;
+
+    fseek(fp, 0, SEEK_SET);
+    fwrite(vetor_alunos, sizeof(Aluno), NUM_MAX_CADASTROS_ALUNOS, fp);
+    fseek(fp_total, 0, SEEK_SET);
+    fwrite(&total_alunos, sizeof(int), 1, fp_total);
+
+    fclose(fp);
+    fclose(fp_total);
 }
 
 void init_arquivo_admin()
