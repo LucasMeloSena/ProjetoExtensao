@@ -57,7 +57,8 @@ int total_cuidadores = 0;
 int total_observacoes = 0;
 char caminho_arquivo_total_alunos[256] = "./total_alunos.dat";
 char caminho_arquivo_alunos[256] = "./alunos.dat";
-char caminho_arquivo_admin[256];
+char caminho_arquivo_admin[256] = "./admins.dat";
+char caminho_arquivo_total_admins[256] = "./total_admins.dat";
 char caminho_arquivo_cuidadores[256];
 char caminho_arquivo_observacoes[256];
 time_t agora;
@@ -83,7 +84,6 @@ void salvar_aluno_arquivo();
 void carregar_alunos_arquivo();
 void remover_aluno_arquivo(char matricula[]);
 void editar_aluno_arquivo(Aluno aluno_atualizado);
-void init_arquivo_admin();
 void salvar_admin_arquivo();
 void carregar_admin_arquivo();
 
@@ -96,7 +96,6 @@ int main()
 {
     setlocale(LC_ALL, "portuguese");
     system("chcp 1252 > null");
-    init_arquivo_admin();
 
     int sair = 0;
     int opcao;
@@ -410,6 +409,7 @@ int tela_login_admin()
         printf("Senha: %s", vetor_admin[0].senha);
         printf("\nNão foi encontrado o admin com os dados informados!\n\n");
         pausar();
+        return 0;
     }
 }
 
@@ -982,7 +982,7 @@ int tela_sair()
 // CRUD Alunos
 void salvar_aluno_arquivo()
 {
-    FILE *fp = fopen(caminho_arquivo_alunos, "wb");
+    FILE *fp = fopen(caminho_arquivo_alunos, "ab");
     FILE *fp_total = fopen(caminho_arquivo_total_alunos, "wb");
 
     if (fp == NULL)
@@ -990,7 +990,7 @@ void salvar_aluno_arquivo()
         printf("Erro ao abrir o arquivo!");
         exit(EXIT_FAILURE);
     }
-    fwrite(vetor_alunos, sizeof(Aluno), 1, fp);
+    fwrite(&vetor_alunos[total_alunos - 1], sizeof(Aluno), 1, fp);
     fwrite(&total_alunos, sizeof(int), 1, fp_total);
 
     fclose(fp);
@@ -1008,9 +1008,8 @@ void carregar_alunos_arquivo()
         exit(EXIT_FAILURE);
     }
 
-    fread(vetor_alunos, sizeof(Aluno), 1, fp);
     fread(&total_alunos, sizeof(int), 1, fp_total);
-
+    fread(vetor_alunos, sizeof(Aluno), total_alunos, fp);
     fclose(fp);
     fclose(fp_total);
 }
@@ -1032,7 +1031,7 @@ void remover_aluno_arquivo(char matricula[])
     int encontrado = 0;
     for (int i = 0; i < NUM_MAX_CADASTROS_ALUNOS; i++)
     {
-        if (vetor_alunos[i].matricula == matricula && vetor_alunos[i].ocupado != 0)
+        if (strcmp(vetor_alunos[i].matricula, matricula) == 0 && vetor_alunos[i].ocupado != 0)
         {
             vetor_alunos[i].ocupado = 0;
             encontrado = 1;
@@ -1042,7 +1041,7 @@ void remover_aluno_arquivo(char matricula[])
 
     if (!encontrado)
     {
-        printf("Aluno com matrícula %d não encontrado.\n", matricula);
+        printf("Aluno com matrícula %s não encontrado.\n", matricula);
         fclose(fp);
         fclose(fp_total);
         return;
@@ -1099,66 +1098,38 @@ void editar_aluno_arquivo(Aluno aluno)
 }
 
 // CRUD Admin
-void init_arquivo_admin()
-{
-    strcpy(caminho_arquivo_admin, "admin.txt");
-    FILE *fp = fopen(caminho_arquivo_admin, "r");
-
-    if (fp == NULL)
-    {
-        fp = fopen(caminho_arquivo_admin, "w");
-        fprintf(fp, "%d\n", total_admin);
-        fclose(fp);
-    }
-    else
-    {
-        fclose(fp);
-    }
-}
-
 void salvar_admin_arquivo()
 {
-    FILE *fp = fopen(caminho_arquivo_admin, "w");
+    FILE *fp = fopen(caminho_arquivo_admin, "ab");
+    FILE *fp_total = fopen(caminho_arquivo_total_admins, "wb");
 
     if (fp == NULL)
     {
         printf("Erro ao abrir o arquivo!");
         exit(EXIT_FAILURE);
     }
-    fprintf(fp, "%d\n", total_admin);
+    fwrite(&vetor_admin[total_admin - 1], sizeof(Admin), 1, fp);
+    fwrite(&total_admin, sizeof(int), 1, fp_total);
 
-    for (int i = 0; i < NUM_MAX_CADASTROS_ADMIN; i++)
-    {
-        if (vetor_admin[i].ocupado == 1)
-        {
-            fprintf(fp, "%s\n", vetor_admin[i].id);
-            fprintf(fp, "%s\n", vetor_admin[i].nome);
-            fprintf(fp, "%s\n", vetor_admin[i].senha);
-        }
-    }
     fclose(fp);
+    fclose(fp_total);
 }
 
 void carregar_admin_arquivo()
 {
-    FILE *fp = fopen(caminho_arquivo_admin, "r");
+    FILE *fp = fopen(caminho_arquivo_admin, "rb");
+    FILE *fp_total = fopen(caminho_arquivo_total_admins, "rb");
+
     if (fp == NULL)
     {
         printf("Erro ao abrir o arquivo!");
         exit(EXIT_FAILURE);
     }
-    fscanf(fp, "%d ", &total_admin);
 
-    for (int i = 0; i < total_admin; i++)
-    {
-        Admin admin;
-        fscanf(fp, "%11[^\n] ", admin.id);
-        fscanf(fp, "%255[^\n] ", admin.nome);
-        fscanf(fp, "%9[^\n] ", admin.senha);
-        admin.ocupado = 1;
-        vetor_admin[i] = admin;
-    }
+    fread(&total_admin, sizeof(int), 1, fp_total);
+    fread(vetor_admin, sizeof(Admin), total_admin, fp);
     fclose(fp);
+    fclose(fp_total);
 }
 
 void limpar()
