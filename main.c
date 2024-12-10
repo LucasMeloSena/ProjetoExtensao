@@ -69,28 +69,43 @@ time_t agora;
 int tela_menu_opcoes_home();
 int tela_menu_opcoes_cadastro_login_admin();
 int tela_menu_opcoes_login_cuidador();
-void tela_cadastrar_admin();
 int tela_login_admin();
 int tela_login_cuidador();
 int tela_menu_opcoes_admin();
 int tela_menu_opcoes_cuidador();
 
-// Telas admin:
-void tela_cadastrar_aluno();
-void tela_pesquisar_aluno_by_matricula();
-void tela_relatorio_alunos();
-void tela_remover_aluno();
-void tela_editar_aluno();
-void salvar_aluno_arquivo();
-void carregar_alunos_arquivo();
-void remover_aluno_arquivo(char matricula[]);
-void editar_aluno_arquivo(Aluno aluno_atualizado);
+// Cadastros:
+void tela_cadastrar_admin();
 void salvar_admin_arquivo();
-void carregar_admin_arquivo();
-void carregar_cuidadores_arquivo();
+void tela_cadastrar_aluno();
+void salvar_aluno_arquivo();
+void tela_cadastrar_cuidador();
 void salvar_cuidador_arquivo();
-void editar_cuidador_arquivo();
-void remover_cuidador_arquivo();
+void tela_adicionar_observacao();
+void adicionar_observacao_arquivo();
+
+// Listagems únicas:
+void tela_pesquisar_aluno_by_matricula();
+void tela_pesquisar_cuidador_by_matricula();
+
+// Listagens gerais:
+void tela_relatorio_alunos();
+void carregar_alunos_arquivo();
+void carregar_admin_arquivo();
+void tela_relatorio_cuidadores();
+void carregar_cuidadores_arquivo();
+
+// Edições:
+void tela_editar_aluno();
+void editar_aluno_arquivo(Aluno aluno);
+void tela_editar_cuidador();
+void editar_cuidador_arquivo(Cuidador cuidador);
+
+// Exclusões:
+void tela_remover_aluno();
+void remover_aluno_arquivo(char matricula[]);
+void tela_remover_cuidador();
+void remover_cuidador_arquivo(char matricula[]);
 
 // Telas comuns
 void limpar();
@@ -117,6 +132,7 @@ int main()
     {
         opcao = tela_menu_opcoes_home();
         int opcao_cadastro_login_admin;
+        int opcao_login_cuidador;
         int opcao_admin;
         int opcao_cuidador;
 
@@ -149,6 +165,21 @@ int main()
                     tela_relatorio_alunos();
                     break;
                 case 6:
+                    tela_cadastrar_cuidador();
+                    break;
+                case 7:
+                    tela_pesquisar_cuidador_by_matricula();
+                    break;
+                case 8:
+                    tela_remover_cuidador();
+                    break;
+                case 9:
+                    tela_editar_cuidador();
+                    break;
+                case 10:
+                    tela_relatorio_cuidadores();
+                    break;
+                case 11:
                     break;
                 default:
                     printf("\nOpção Inválida!!! \n");
@@ -156,13 +187,31 @@ int main()
                 }
                 break;
             }
-            break;
+        break;
         case 2:
-            opcao_cuidador = tela_menu_opcoes_login_cuidador();
+            opcao_login_cuidador = tela_menu_opcoes_login_cuidador();
             switch (opcao_cuidador) {
+                case 1:
+                    opcao_cuidador = tela_login_admin();
+                    switch (opcao_cuidador)
+                    {
+                    case 1:
+                        tela_pesquisar_aluno_by_matricula();
+                        break;
+                    case 2:
+                        tela_adicionar_observacao();
+                        break;
+                    case 3:
+                        break;
+                break;
 
+                default:
+                    printf("\nOpção Inválida!!! \n");
+                    pausar();
+                }
+                break;
             }
-            break;
+        break;
         case 3:
             sair = tela_sair();
             if (sair == 1)
@@ -227,6 +276,27 @@ int tela_menu_opcoes_cadastro_login_admin()
     return opcao;
 }
 
+int tela_menu_opcoes_login_cuidador()
+{
+    int opcao;
+
+    limpar();
+    printf("Menu de Opções - Cuidador \n");
+    printf("1 - Login\n");
+    printf("2 - Voltar \n\n");
+
+    printf("Escolha uma opção: ");
+    int erro = scanf("%d", &opcao);
+
+    if (erro != 1)
+    {
+        fflush(stdin);
+        opcao = -1;
+    }
+
+    return opcao;
+}
+
 int tela_menu_opcoes_admin()
 {
     int opcao;
@@ -238,7 +308,34 @@ int tela_menu_opcoes_admin()
     printf("3 - Remover Aluno\n");
     printf("4 - Editar Aluno\n");
     printf("5 - Relatório de Alunos Cadastrados\n");
-    printf("6 - Sair \n\n");
+    printf("6 - Cadastrar Cuidador\n");
+    printf("7 - Pesquisar Cuidador por Matrícula\n");
+    printf("8 - Remover Cuidador\n");
+    printf("9 - Editar Cuidador\n");
+    printf("10 - Relatório de Cuidadores Cadastrados\n");
+    printf("11 - Sair \n\n");
+
+    printf("Escolha uma opção: ");
+    int erro = scanf("%d", &opcao);
+
+    if (erro != 1)
+    {
+        fflush(stdin);
+        opcao = -1;
+    }
+
+    return opcao;
+}
+
+int tela_menu_opcoes_cuidador()
+{
+    int opcao;
+
+    limpar();
+    printf("Menu de Opções \n");
+    printf("1 - Pesquisar Aluno por Matrícula\n");
+    printf("2 - Adicionar Observação Diária de Discente\n");
+    printf("3 - Sair \n\n");
 
     printf("Escolha uma opção: ");
     int erro = scanf("%d", &opcao);
@@ -493,7 +590,6 @@ void tela_cadastrar_cuidador()
         }
     }
 }
-
 
 int tela_login_cuidador() {
     char ch;
@@ -1127,6 +1223,255 @@ void tela_relatorio_alunos()
     pausar();
 }
 
+void tela_pesquisar_cuidador_by_matricula() {
+    int continuar;
+    char ch;
+    int erro;
+    int idxPesquisa = -1;
+    char matricula[12];
+
+    do
+    {
+        limpar();
+        carregar_cuidadores_arquivo();
+        printf("-- Menu Pesquisar Cuidador por Matrícula -- \n");
+        erro = 0;
+
+        printf("\nDigite a matrícula do cuidador: ");
+        scanf(" %11[^\n]", matricula);
+        fflush(stdin);
+
+        int idxPesquisa = -1;
+        for (int i = 0; i < total_cuidadores; i++)
+        {
+            if (vetor_cuidadores[i].ocupado == 1)
+            {
+                if (strcmp(vetor_cuidadores[i].matricula, matricula) == 0)
+                {
+                    idxPesquisa = i;
+                    break;
+                }
+            }
+        }
+
+        if (idxPesquisa != -1)
+        {
+            printf("\nCuidador encontrado: \n");
+            printf("Matrícula: %s\n", vetor_cuidadores[idxPesquisa].matricula);
+            printf("Nome: %s\n", vetor_cuidadores[idxPesquisa].nome);
+            pausar();
+        }
+        else
+        {
+            printf("\nNão foi encontrado um cuidador com a matrícula informada!\n\n");
+            pausar();
+        }
+
+        do
+        {
+            printf("Gostaria de pesquisar outro cuidador? (s/n): ");
+            scanf(" %c", &ch);
+            fflush(stdin);
+            ch = toupper(ch);
+        } while (!(ch == 'S' || ch == 'N'));
+
+        if (ch == 'S')
+        {
+            continuar = 1;
+        }
+        else
+        {
+            continuar = 0;
+        }
+
+    } while (continuar == 1);
+}
+
+void tela_remover_cuidador()
+{
+    int continuar;
+    char ch;
+    int erro;
+    int idxPesquisa = -1;
+    char matricula[12];
+
+    do
+    {
+        limpar();
+        carregar_cuidadores_arquivo();
+        printf("-- Menu Remover Cuidador --\n");
+
+        erro = 0;
+        printf("\nDigite a matrícula: ");
+        scanf(" %11[^\n]", matricula);
+        fflush(stdin);
+
+        idxPesquisa = -1;
+        for (int i = 0; i < NUM_MAX_CADASTROS_CUIDADORES; i++)
+        {
+            if (vetor_cuidadores[i].ocupado == 1)
+            {
+                if (strcmp(vetor_cuidadores[i].matricula, matricula) == 0)
+                {
+                    vetor_cuidadores[i].ocupado = 0;
+                    idxPesquisa = i;
+                    remover_cuidador_arquivo(vetor_cuidadores[i].matricula);
+                    break;
+                }
+            }
+        }
+
+        if (idxPesquisa != -1)
+        {
+            printf("\nCuidador removido com sucesso!\n");
+        }
+        else
+        {
+            printf("\nNão foi possível remover o cuidador!\n");
+        }
+        pausar();
+
+        do
+        {
+
+            printf("\nGostaria de remover outro cuidador? (s/n): ");
+            scanf(" %c", &ch);
+
+            fflush(stdin);
+
+            ch = toupper(ch);
+
+        } while (!(ch == 'S' || ch == 'N'));
+
+        if (ch == 'S')
+        {
+            continuar = 1;
+        }
+        else
+        {
+            continuar = 0;
+        }
+    } while (continuar);
+}
+
+void tela_editar_cuidador()
+{
+    int idxPesquisa = -1;
+    char matricula[12];
+    char senha[10];
+
+    limpar();
+    carregar_cuidadores_arquivo();
+    printf("-- Menu Atualizar Cuidador -- \n");
+
+    printf("\nDigite a matrícula do cuidador: ");
+    scanf(" %11[^\n]", matricula);
+    fflush(stdin);
+
+    for (int i = 0; i < total_cuidadores; i++)
+    {
+        if (vetor_cuidadores[i].ocupado == 1)
+        {
+            if (strcmp(vetor_cuidadores[i].matricula, matricula) == 0)
+            {
+                idxPesquisa = i;
+                break;
+            }
+        }
+    }
+
+    if (idxPesquisa != -1)
+    {
+        printf("\nCuidador encontrado: \n");
+        printf("Matrícula: %s\n", vetor_cuidadores[idxPesquisa].matricula);
+        printf("Nome: %s\n", vetor_cuidadores[idxPesquisa].nome);
+        printf("Senha: %d\n", vetor_cuidadores[idxPesquisa].senha);
+    }
+    else
+    {
+        printf("\nNão foi encontrado um cuidador com a matrícula informada!\n\n");
+        pausar();
+    }
+
+    int erro;
+    char nome[256];
+    int idade;
+    char sexo, strSexo[3];
+    char turma[10];
+    char informacoes[1000];
+
+    do
+    {
+        erro = 0;
+
+        printf("*Digite o nome: ");
+        scanf(" %255[^\n]", nome);
+        fflush(stdin);
+
+        if (strlen(nome) > 254)
+        {
+            erro = 1;
+            printf("ERRO: O nome pode possuir no máximo 254 carracteres!\n");
+        }
+        if (strlen(nome) < 3)
+        {
+            erro = 1;
+            printf("ERRO: O nome deve possuir pelo menos 3 (três) carracteres!\n");
+        }
+
+    } while (erro == 1);
+
+        do
+    {
+        erro = 0;
+
+        printf("*Digite a senha: ");
+        scanf(" %9[^\n]", senha);
+        fflush(stdin);
+
+        if (strlen(senha) > 9)
+        {
+            erro = 1;
+            printf("ERRO: A senha pode possuir no máximo 9 carracteres!\n");
+        }
+        if (strlen(senha) < 4)
+        {
+            erro = 1;
+            printf("ERRO: A senha deve possuir pelo menos 4 carracteres!\n");
+        }
+    } while (erro == 1);
+
+    Cuidador cuidador;
+    cuidador.ocupado = 1;
+    strcpy(cuidador.nome, nome);
+    strcpy(cuidador.matricula, matricula);
+    strcpy(cuidador.senha, senha);
+    editar_cuidador_arquivo(cuidador);
+
+    printf("\nCuidador atualizado com sucesso! \n");
+    pausar();
+}
+
+void tela_relatorio_cuidadores()
+{
+    limpar();
+    carregar_cuidadores_arquivo();
+    pausar();
+    printf("-- Menu Relatório Cuidadores -- \n\n");
+
+    for (int i = 0; i < NUM_MAX_CADASTROS_CUIDADORES; i++)
+    {
+        if (vetor_cuidadores[i].ocupado == 1)
+        {
+            printf("Matrícula: %s\n", vetor_cuidadores[i].matricula);
+            printf("Nome: %s\n", vetor_cuidadores[i].nome);
+        }
+    }
+
+    pausar();
+}
+
+
 int tela_sair()
 {
     char ch;
@@ -1311,6 +1656,7 @@ void carregar_admin_arquivo()
     fclose(fp_total);
 }
 
+// Funções gerais:
 void limpar()
 {
     system("clear");
