@@ -187,23 +187,24 @@ int main()
                 }
                 break;
             }
-        break;
+            break;
         case 2:
             opcao_login_cuidador = tela_menu_opcoes_login_cuidador();
-            switch (opcao_cuidador) {
+            switch (opcao_cuidador)
+            {
+            case 1:
+                opcao_cuidador = tela_login_admin();
+                switch (opcao_cuidador)
+                {
                 case 1:
-                    opcao_cuidador = tela_login_admin();
-                    switch (opcao_cuidador)
-                    {
-                    case 1:
-                        tela_pesquisar_aluno_by_matricula();
-                        break;
-                    case 2:
-                        tela_adicionar_observacao();
-                        break;
-                    case 3:
-                        break;
-                break;
+                    tela_pesquisar_aluno_by_matricula();
+                    break;
+                case 2:
+                    tela_adicionar_observacao();
+                    break;
+                case 3:
+                    break;
+                    break;
 
                 default:
                     printf("\nOpção Inválida!!! \n");
@@ -211,7 +212,7 @@ int main()
                 }
                 break;
             }
-        break;
+            break;
         case 3:
             sair = tela_sair();
             if (sair == 1)
@@ -591,7 +592,8 @@ void tela_cadastrar_cuidador()
     }
 }
 
-int tela_login_cuidador() {
+int tela_login_cuidador()
+{
     char ch;
     int erro;
     int idxPesquisa = -1;
@@ -1223,7 +1225,8 @@ void tela_relatorio_alunos()
     pausar();
 }
 
-void tela_pesquisar_cuidador_by_matricula() {
+void tela_pesquisar_cuidador_by_matricula()
+{
     int continuar;
     char ch;
     int erro;
@@ -1259,6 +1262,7 @@ void tela_pesquisar_cuidador_by_matricula() {
             printf("\nCuidador encontrado: \n");
             printf("Matrícula: %s\n", vetor_cuidadores[idxPesquisa].matricula);
             printf("Nome: %s\n", vetor_cuidadores[idxPesquisa].nome);
+            printf("Senha: %s\n\n", vetor_cuidadores[idxPesquisa].senha);
             pausar();
         }
         else
@@ -1385,7 +1389,7 @@ void tela_editar_cuidador()
         printf("\nCuidador encontrado: \n");
         printf("Matrícula: %s\n", vetor_cuidadores[idxPesquisa].matricula);
         printf("Nome: %s\n", vetor_cuidadores[idxPesquisa].nome);
-        printf("Senha: %d\n", vetor_cuidadores[idxPesquisa].senha);
+        printf("Senha: %s\n", vetor_cuidadores[idxPesquisa].senha);
     }
     else
     {
@@ -1421,7 +1425,7 @@ void tela_editar_cuidador()
 
     } while (erro == 1);
 
-        do
+    do
     {
         erro = 0;
 
@@ -1471,7 +1475,6 @@ void tela_relatorio_cuidadores()
     pausar();
 }
 
-
 int tela_sair()
 {
     char ch;
@@ -1501,6 +1504,10 @@ int tela_sair()
     } while (!(ch == 'S' || ch == 'N'));
 
     return sair;
+}
+
+void tela_adicionar_observacao()
+{
 }
 
 // CRUD Alunos
@@ -1771,7 +1778,8 @@ void editar_cuidador_arquivo(Cuidador cuidador)
     fclose(fp_total);
 }
 
-void carregar_cuidadores_arquivo() {
+void carregar_cuidadores_arquivo()
+{
     FILE *fp = fopen(caminho_arquivo_cuidadores, "rb");
     FILE *fp_total = fopen(caminho_arquivo_total_cuidadores, "rb");
 
