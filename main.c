@@ -44,12 +44,14 @@ typedef struct
     char matricula_cuidador[12];
     char observacao[2000];
     char data[100];
+    char hora[100];
 } Observacao;
 
 Admin vetor_admin[NUM_MAX_CADASTROS_ADMIN];
 Aluno vetor_alunos[NUM_MAX_CADASTROS_ALUNOS];
 Cuidador vetor_cuidadores[NUM_MAX_CADASTROS_CUIDADORES];
 Observacao vetor_observacoes[NUM_MAX_CADASTROS_OBSERVACOES];
+Cuidador cuidador_logado;
 
 int total_admin = 0;
 int total_alunos = 0;
@@ -61,9 +63,8 @@ char caminho_arquivo_admin[256] = "./admins.dat";
 char caminho_arquivo_total_admins[256] = "./total_admins.dat";
 char caminho_arquivo_cuidadores[256] = "./cuidadores.dat";
 char caminho_arquivo_total_cuidadores[256] = "./total_cuidadores.dat";
-char caminho_arquivo_observacoes[256];
-time_t agora;
-// agora = time(NULL);
+char caminho_arquivo_observacoes[256] = "./observacoes.dat";
+char caminho_arquivo_total_observacoes[256] = "./total_observacoes.dat";
 
 // Telas iniciais:
 int tela_menu_opcoes_home();
@@ -82,7 +83,7 @@ void salvar_aluno_arquivo();
 void tela_cadastrar_cuidador();
 void salvar_cuidador_arquivo();
 void tela_adicionar_observacao();
-void adicionar_observacao_arquivo();
+void salvar_observacao_arquivo();
 
 // Listagems únicas:
 void tela_pesquisar_aluno_by_matricula();
@@ -94,6 +95,8 @@ void carregar_alunos_arquivo();
 void carregar_admin_arquivo();
 void tela_relatorio_cuidadores();
 void carregar_cuidadores_arquivo();
+void tela_relatorio_observacoes();
+void carregar_observacoes_arquivo();
 
 // Edições:
 void tela_editar_aluno();
@@ -190,6 +193,9 @@ int main()
                     tela_relatorio_cuidadores();
                     break;
                 case 11:
+                    tela_relatorio_observacoes();
+                    break;
+                case 12:
                     break;
                 default:
                     printf("\nOpção Inválida!!! \n");
@@ -200,10 +206,10 @@ int main()
             break;
         case 2:
             opcao_login_cuidador = tela_menu_opcoes_login_cuidador();
-            switch (opcao_cuidador)
+            switch (opcao_login_cuidador)
             {
             case 1:
-                opcao_cuidador = tela_login_admin();
+                opcao_cuidador = tela_login_cuidador();
                 switch (opcao_cuidador)
                 {
                 case 1:
@@ -214,8 +220,6 @@ int main()
                     break;
                 case 3:
                     break;
-                    break;
-
                 default:
                     printf("\nOpção Inválida!!! \n");
                     pausar();
@@ -324,7 +328,8 @@ int tela_menu_opcoes_admin()
     printf("8 - Remover Cuidador\n");
     printf("9 - Editar Cuidador\n");
     printf("10 - Relatório de Cuidadores Cadastrados\n");
-    printf("11 - Sair \n\n");
+    printf("11 - Relatório de Observações\n");
+    printf("12 - Sair \n\n");
 
     printf("Escolha uma opção: ");
     int erro = scanf("%d", &opcao);
@@ -629,55 +634,6 @@ void tela_cadastrar_cuidador()
     }
 }
 
-int tela_login_cuidador()
-{
-    char ch;
-    int erro;
-    int idxPesquisa = -1;
-    char id[12];
-    char senha[10];
-
-    limpar();
-    carregar_cuidadores_arquivo();
-    printf("-- Menu Login Cuidador -- \n");
-    erro = 0;
-
-    printf("\nDigite o id: ");
-    scanf(" %11[^\n]", id);
-    fflush(stdin);
-    printf("Digite a senha: ");
-    scanf(" %9[^\n]", senha);
-    fflush(stdin);
-
-    for (int i = 0; i < total_cuidadores; i++)
-    {
-        if (vetor_cuidadores[i].ocupado == 1)
-        {
-            if (strcmp(vetor_cuidadores[i].matricula, id) == 0 && strcmp(vetor_cuidadores[i].senha, senha) == 0)
-            {
-                idxPesquisa = i;
-                break;
-            }
-        }
-    }
-
-    if (idxPesquisa != -1)
-    {
-        printf("\nLogin realizado com sucesso! Bem-vindo(a), %s.\n", vetor_cuidadores[idxPesquisa].nome);
-        pausar();
-
-        return tela_menu_opcoes_cuidador();
-    }
-    else
-    {
-        printf("Id: %s", vetor_admin[0].id);
-        printf("Senha: %s", vetor_admin[0].senha);
-        printf("\nNão foi encontrado o admin com os dados informados!\n\n");
-        pausar();
-        return 0;
-    }
-}
-
 int tela_login_admin()
 {
     char ch;
@@ -727,6 +683,58 @@ int tela_login_admin()
     }
 }
 
+int tela_login_cuidador()
+{
+    char ch;
+    int erro;
+    int idxPesquisa = -1;
+    char id[12];
+    char senha[10];
+
+    limpar();
+    carregar_cuidadores_arquivo();
+    printf("-- Menu Login Cuidador -- \n");
+    erro = 0;
+
+    printf("\nDigite a matricula: ");
+    scanf(" %11[^\n]", id);
+    fflush(stdin);
+    printf("Digite a senha: ");
+    scanf(" %9[^\n]", senha);
+    fflush(stdin);
+
+    for (int i = 0; i < total_cuidadores; i++)
+    {
+        if (vetor_cuidadores[i].ocupado == 1)
+        {
+            if (strcmp(vetor_cuidadores[i].matricula, id) == 0 && strcmp(vetor_cuidadores[i].senha, senha) == 0)
+            {
+                idxPesquisa = i;
+                break;
+            }
+        }
+    }
+
+    if (idxPesquisa != -1)
+    {
+        printf("\nLogin realizado com sucesso! Bem-vindo(a), %s.\n", vetor_cuidadores[idxPesquisa].nome);
+        strcpy(cuidador_logado.matricula, vetor_cuidadores[idxPesquisa].matricula);
+        strcpy(cuidador_logado.nome, vetor_cuidadores[idxPesquisa].nome);
+        strcpy(cuidador_logado.senha, vetor_cuidadores[idxPesquisa].senha);
+        cuidador_logado.ocupado = vetor_cuidadores[idxPesquisa].ocupado;
+
+        pausar();
+
+        return tela_menu_opcoes_cuidador();
+    }
+    else
+    {
+        printf("\nNão foi encontrado o cuidador com os dados informados!\n\n");
+        pausar();
+        return 0;
+    }
+}
+
 void tela_cadastrar_aluno()
 {
     int continuar;
@@ -763,7 +771,7 @@ void tela_cadastrar_aluno()
             scanf(" %11[^\n]", matricula);
             fflush(stdin);
 
-            if (strlen(nome) > 11)
+            if (strlen(matricula) > 11)
             {
                 erro = 1;
                 printf("ERRO: A matrícula pode possuir no máximo 11 carracteres!\n");
@@ -1568,6 +1576,69 @@ void tela_relatorio_cuidadores()
     pausar();
 }
 
+void tela_relatorio_observacoes()
+{
+    limpar();
+    carregar_cuidadores_arquivo();
+    carregar_alunos_arquivo();
+    carregar_observacoes_arquivo();
+    getchar();
+    printf("-- Menu Relatório Observações -- \n\n");
+
+    int total_ocupados = 0;
+    for (int i = 0; i < total_observacoes; i++)
+    {
+        if (vetor_observacoes[i].ocupado == 1)
+        {
+            total_ocupados++;
+        }
+    }
+
+    printf("Número de observações cadastradas: %d\n\n", total_observacoes);
+
+    for (int i = 0; i < NUM_MAX_CADASTROS_OBSERVACOES; i++)
+    {
+        if (vetor_observacoes[i].ocupado == 1)
+        {
+            char aluno[256];
+            char cuidador[256];
+
+            for (int i = 0; i < total_alunos; i++)
+            {
+                if (vetor_alunos[i].ocupado == 1)
+                {
+                    if (strcmp(vetor_alunos[i].matricula, vetor_observacoes[i].matricula_aluno) == 0)
+                    {
+                        strcpy(aluno, vetor_alunos[i].nome);
+                        break;
+                    }
+                }
+            }
+            for (int i = 0; i < total_cuidadores; i++)
+            {
+                if (vetor_cuidadores[i].ocupado == 1)
+                {
+                    if (strcmp(vetor_cuidadores[i].matricula, vetor_observacoes[i].matricula_cuidador) == 0)
+                    {
+                        strcpy(cuidador, vetor_cuidadores[i].nome);
+                        break;
+                    }
+                }
+            }
+
+            printf("Matrícula Aluno: %s\n", vetor_observacoes[i].matricula_aluno);
+            printf("Aluno: %s\n", aluno);
+            printf("Matrícula Cuidador: %s\n", vetor_observacoes[i].matricula_cuidador);
+            printf("Cuidador: %s\n", cuidador);
+            printf("Data: %s\n", vetor_observacoes[i].data);
+            printf("Hora: %s\n", vetor_observacoes[i].hora);
+            printf("Observação: %s\n\n", vetor_observacoes[i].observacao);
+        }
+    }
+
+    pausar();
+}
+
 int tela_sair()
 {
     char ch;
@@ -1601,6 +1672,103 @@ int tela_sair()
 
 void tela_adicionar_observacao()
 {
+    carregar_observacoes_arquivo();
+
+    time_t agora = time(NULL);
+    struct tm tm = *localtime(&agora);
+    char data[100];
+    char hora[100];
+    sprintf(data, "%02d/%02d/%d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+    sprintf(hora, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+    char ch;
+    int erro;
+
+    char matricula_aluno[12];
+    char observacao[2000];
+
+    limpar();
+    carregar_alunos_arquivo();
+    printf("-- Menu Cadastrar Observação -- \n");
+
+    if (total_observacoes >= NUM_MAX_CADASTROS_OBSERVACOES)
+    {
+        printf("\nErro: O cadastro já atingiu sua capacidade máxima!\n");
+        pausar();
+    }
+
+    do
+    {
+        erro = 0;
+
+        printf("\n*Digite a matrícula do aluno: ");
+        scanf(" %11[^\n]", matricula_aluno);
+        fflush(stdin);
+
+        if (strlen(matricula_aluno) > 11)
+        {
+            erro = 1;
+            printf("ERRO: A matrícula pode possuir no máximo 11 carracteres!\n");
+        }
+        if (strlen(matricula_aluno) < 3)
+        {
+            erro = 1;
+            printf("ERRO: A matrícula deve possuir pelo menos 3 (três) carracteres!\n");
+        }
+    } while (erro == 1);
+
+    int idxPesquisa = -1;
+    for (int i = 0; i < total_alunos; i++)
+    {
+        if (vetor_alunos[i].ocupado == 1)
+        {
+            if (strcmp(vetor_alunos[i].matricula, matricula_aluno) == 0)
+            {
+                idxPesquisa = i;
+                break;
+            }
+        }
+    }
+
+    if (idxPesquisa != -1)
+    {
+        do
+        {
+            erro = 0;
+
+            printf("*Digite a observação: ");
+            scanf(" %1999[^\n]", observacao);
+            fflush(stdin);
+
+            if (strlen(observacao) > 1999)
+            {
+                erro = 1;
+                printf("ERRO: A observações pode possuir no máximo 1999 carracteres!\n");
+            }
+            if (strlen(observacao) < 10)
+            {
+                erro = 1;
+                printf("ERRO: A observação deve possuir pelo menos 10 carracteres!\n");
+            }
+        } while (erro == 1);
+
+        vetor_observacoes[total_observacoes].ocupado = 1;
+        strcpy(vetor_observacoes[total_observacoes].observacao, observacao);
+        strcpy(vetor_observacoes[total_observacoes].data, data);
+        strcpy(vetor_observacoes[total_observacoes].hora, hora);
+        strcpy(vetor_observacoes[total_observacoes].matricula_cuidador, cuidador_logado.matricula);
+        strcpy(vetor_observacoes[total_observacoes].matricula_aluno, matricula_aluno);
+        total_observacoes++;
+        salvar_observacao_arquivo();
+
+        printf("\nDados cadastrados com sucesso! \n");
+        pausar();
+    }
+    else
+    {
+        printf("\nNão foi encontrado um aluno com a matrícula informada!\n\n");
+        pausar();
+    }
 }
 
 // CRUD Alunos
@@ -1905,6 +2073,39 @@ void carregar_cuidadores_arquivo()
 
     fread(&total_cuidadores, sizeof(int), 1, fp_total);
     fread(vetor_cuidadores, sizeof(Cuidador), total_cuidadores, fp);
+    fclose(fp);
+    fclose(fp_total);
+}
+
+void salvar_observacao_arquivo()
+{
+    FILE *fp = fopen(caminho_arquivo_observacoes, "ab");
+    FILE *fp_total = fopen(caminho_arquivo_total_observacoes, "wb");
+
+    if (fp == NULL)
+    {
+        printf("Erro ao abrir o arquivo!");
+        exit(EXIT_FAILURE);
+    }
+    fwrite(&total_observacoes, sizeof(int), 1, fp_total);
+    fwrite(&vetor_observacoes[total_observacoes - 1], sizeof(Observacao), 1, fp);
+    fclose(fp);
+    fclose(fp_total);
+}
+
+void carregar_observacoes_arquivo()
+{
+    FILE *fp = fopen(caminho_arquivo_observacoes, "rb");
+    FILE *fp_total = fopen(caminho_arquivo_total_observacoes, "rb");
+
+    if (fp == NULL)
+    {
+        printf("Erro ao abrir o arquivo!");
+        exit(EXIT_FAILURE);
+    }
+
+    fread(&total_observacoes, sizeof(int), 1, fp_total);
+    fread(vetor_observacoes, sizeof(Observacao), total_observacoes, fp);
     fclose(fp);
     fclose(fp_total);
 }
