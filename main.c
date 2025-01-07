@@ -907,7 +907,7 @@ void tela_cadastrar_aluno()
         {
             if (total_alunos == 0)
             {
-                vetor_alunos[0].ocupado = 0;
+                vetor_alunos[0].ocupado = 1;
                 strcpy(vetor_alunos[0].nome, nome);
                 strcpy(vetor_alunos[0].matricula, matricula);
                 vetor_alunos[0].idade = idade;
