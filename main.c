@@ -1596,31 +1596,32 @@ void tela_relatorio_observacoes()
 
     printf("Número de observações cadastradas: %d\n\n", total_observacoes);
 
-    for (int i = 0; i < NUM_MAX_CADASTROS_OBSERVACOES; i++)
+    for (int i = 0; i < total_observacoes; i++)
     {
         if (vetor_observacoes[i].ocupado == 1)
         {
             char aluno[256];
             char cuidador[256];
 
-            for (int i = 0; i < total_alunos; i++)
+            for (int j = 0; j < total_alunos; j++)
             {
-                if (vetor_alunos[i].ocupado == 1)
+                if (vetor_alunos[j].ocupado == 1)
                 {
-                    if (strcmp(vetor_alunos[i].matricula, vetor_observacoes[i].matricula_aluno) == 0)
+                    if (strcmp(vetor_alunos[j].matricula, vetor_observacoes[i].matricula_aluno) == 0)
                     {
-                        strcpy(aluno, vetor_alunos[i].nome);
+                        strcpy(aluno, vetor_alunos[j].nome);
                         break;
                     }
                 }
             }
-            for (int i = 0; i < total_cuidadores; i++)
+
+            for (int j = 0; j < total_cuidadores; j++)
             {
-                if (vetor_cuidadores[i].ocupado == 1)
+                if (vetor_cuidadores[j].ocupado == 1)
                 {
-                    if (strcmp(vetor_cuidadores[i].matricula, vetor_observacoes[i].matricula_cuidador) == 0)
+                    if (strcmp(vetor_cuidadores[j].matricula, vetor_observacoes[i].matricula_cuidador) == 0)
                     {
-                        strcpy(cuidador, vetor_cuidadores[i].nome);
+                        strcpy(cuidador, vetor_cuidadores[j].nome);
                         break;
                     }
                 }
