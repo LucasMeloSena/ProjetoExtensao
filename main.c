@@ -162,6 +162,8 @@ int main()
                 opcao_admin = tela_login_admin();
                 switch (opcao_admin)
                 {
+                case 0:
+                    break;
                 case 1:
                     tela_cadastrar_aluno();
                     break;
@@ -675,8 +677,6 @@ int tela_login_admin()
     }
     else
     {
-        printf("Id: %s", vetor_admin[0].id);
-        printf("Senha: %s", vetor_admin[0].senha);
         printf("\nNão foi encontrado o admin com os dados informados!\n\n");
         pausar();
         return 0;
