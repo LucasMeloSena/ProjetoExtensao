@@ -214,6 +214,8 @@ int main()
                 opcao_cuidador = tela_login_cuidador();
                 switch (opcao_cuidador)
                 {
+                case 0:
+                    break;
                 case 1:
                     tela_pesquisar_aluno_by_matricula();
                     break;
