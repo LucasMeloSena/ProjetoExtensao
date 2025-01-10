@@ -1155,131 +1155,131 @@ void tela_editar_aluno()
         printf("Sexo: %c\n", vetor_alunos[idxPesquisa].sexo);
         printf("Turma: %s\n", vetor_alunos[idxPesquisa].turma);
         printf("Informações: %s\n\n", vetor_alunos[idxPesquisa].informacoes);
+
+        int erro;
+        char nome[256];
+        int idade;
+        char sexo, strSexo[3];
+        char turma[10];
+        char informacoes[1000];
+
+        do
+        {
+            erro = 0;
+
+            printf("*Digite o nome: ");
+            scanf(" %255[^\n]", nome);
+            fflush(stdin);
+
+            if (strlen(nome) > 254)
+            {
+                erro = 1;
+                printf("ERRO: O nome pode possuir no máximo 254 carracteres!\n");
+            }
+            if (strlen(nome) < 3)
+            {
+                erro = 1;
+                printf("ERRO: O nome deve possuir pelo menos 3 (três) carracteres!\n");
+            }
+
+        } while (erro == 1);
+
+        do
+        {
+            printf("*Digite a idade: ");
+            erro = scanf("%d", &idade);
+
+            fflush(stdin);
+
+            if (erro != 1)
+            {
+                printf("ERRO: Digite um valor inteiro válido!\n");
+            }
+            else if (idade < 1 || idade > 20)
+            {
+                erro = -1;
+                printf("ERRO: A idade deve estar entre 1 e 20 anos!\n");
+            }
+
+        } while (erro != 1);
+
+        do
+        {
+            erro = 0;
+
+            printf("*Digite o sexo (M/F): ");
+            scanf(" %2[^\n]", strSexo);
+            fflush(stdin);
+
+            if (strlen(strSexo) == 1)
+            {
+                sexo = toupper(strSexo[0]);
+            }
+            else
+            {
+                erro = 1;
+            }
+            if (!(sexo == 'M' || sexo == 'F') || erro == 1)
+            {
+                erro = 1;
+                printf("ERRO: São aceitos apenas os valores 'M' ou 'F'!\n");
+            }
+
+        } while (erro == 1);
+
+        do
+        {
+            erro = 0;
+
+            printf("*Digite a turma: ");
+            scanf(" %9[^\n]", turma);
+            fflush(stdin);
+
+            if (strlen(turma) > 9)
+            {
+                erro = 1;
+                printf("ERRO: A turma pode possuir no máximo 9 carracteres!\n");
+            }
+            if (strlen(turma) < 1)
+            {
+                erro = 1;
+                printf("ERRO: A turma deve possuir pelo menos 1 carractere!\n");
+            }
+        } while (erro == 1);
+
+        do
+        {
+            erro = 0;
+
+            printf("Digite as informações do aluno: ");
+            scanf(" %999[^\n]", informacoes);
+            fflush(stdin);
+
+            if (strlen(informacoes) > 999)
+            {
+                erro = 1;
+                printf("ERRO: As informações pode possuir no máximo 999 carracteres!\n");
+            }
+        } while (erro == 1);
+
+        Aluno aluno;
+        aluno.ocupado = 1;
+        strcpy(aluno.nome, nome);
+        strcpy(aluno.matricula, matricula);
+        aluno.idade = idade;
+        aluno.sexo = sexo;
+        strcpy(aluno.turma, turma);
+        strcpy(aluno.informacoes, informacoes);
+        editar_aluno_arquivo(aluno);
+
+        printf("\nAluno atualizado com sucesso! \n");
+        pausar();
     }
     else
     {
         printf("\nNão foi encontrado um aluno com a matrícula informada!\n\n");
         pausar();
     }
-
-    int erro;
-    char nome[256];
-    int idade;
-    char sexo, strSexo[3];
-    char turma[10];
-    char informacoes[1000];
-
-    do
-    {
-        erro = 0;
-
-        printf("*Digite o nome: ");
-        scanf(" %255[^\n]", nome);
-        fflush(stdin);
-
-        if (strlen(nome) > 254)
-        {
-            erro = 1;
-            printf("ERRO: O nome pode possuir no máximo 254 carracteres!\n");
-        }
-        if (strlen(nome) < 3)
-        {
-            erro = 1;
-            printf("ERRO: O nome deve possuir pelo menos 3 (três) carracteres!\n");
-        }
-
-    } while (erro == 1);
-
-    do
-    {
-        printf("*Digite a idade: ");
-        erro = scanf("%d", &idade);
-
-        fflush(stdin);
-
-        if (erro != 1)
-        {
-            printf("ERRO: Digite um valor inteiro válido!\n");
-        }
-        else if (idade < 1 || idade > 20)
-        {
-            erro = -1;
-            printf("ERRO: A idade deve estar entre 1 e 20 anos!\n");
-        }
-
-    } while (erro != 1);
-
-    do
-    {
-        erro = 0;
-
-        printf("*Digite o sexo (M/F): ");
-        scanf(" %2[^\n]", strSexo);
-        fflush(stdin);
-
-        if (strlen(strSexo) == 1)
-        {
-            sexo = toupper(strSexo[0]);
-        }
-        else
-        {
-            erro = 1;
-        }
-        if (!(sexo == 'M' || sexo == 'F') || erro == 1)
-        {
-            erro = 1;
-            printf("ERRO: São aceitos apenas os valores 'M' ou 'F'!\n");
-        }
-
-    } while (erro == 1);
-
-    do
-    {
-        erro = 0;
-
-        printf("*Digite a turma: ");
-        scanf(" %9[^\n]", turma);
-        fflush(stdin);
-
-        if (strlen(turma) > 9)
-        {
-            erro = 1;
-            printf("ERRO: A turma pode possuir no máximo 9 carracteres!\n");
-        }
-        if (strlen(turma) < 1)
-        {
-            erro = 1;
-            printf("ERRO: A turma deve possuir pelo menos 1 carractere!\n");
-        }
-    } while (erro == 1);
-
-    do
-    {
-        erro = 0;
-
-        printf("Digite as informações do aluno: ");
-        scanf(" %999[^\n]", informacoes);
-        fflush(stdin);
-
-        if (strlen(informacoes) > 999)
-        {
-            erro = 1;
-            printf("ERRO: As informações pode possuir no máximo 999 carracteres!\n");
-        }
-    } while (erro == 1);
-
-    Aluno aluno;
-    aluno.ocupado = 1;
-    strcpy(aluno.nome, nome);
-    strcpy(aluno.matricula, matricula);
-    aluno.idade = idade;
-    aluno.sexo = sexo;
-    strcpy(aluno.turma, turma);
-    strcpy(aluno.informacoes, informacoes);
-    editar_aluno_arquivo(aluno);
-
-    printf("\nAluno atualizado com sucesso! \n");
-    pausar();
 }
 
 void tela_relatorio_alunos()
@@ -1480,70 +1480,70 @@ void tela_editar_cuidador()
         printf("Matrícula: %s\n", vetor_cuidadores[idxPesquisa].matricula);
         printf("Nome: %s\n", vetor_cuidadores[idxPesquisa].nome);
         printf("Senha: %s\n\n", vetor_cuidadores[idxPesquisa].senha);
+
+        int erro;
+        char nome[256];
+        int idade;
+        char sexo, strSexo[3];
+        char turma[10];
+        char informacoes[1000];
+
+        do
+        {
+            erro = 0;
+
+            printf("*Digite o nome: ");
+            scanf(" %255[^\n]", nome);
+            fflush(stdin);
+
+            if (strlen(nome) > 254)
+            {
+                erro = 1;
+                printf("ERRO: O nome pode possuir no máximo 254 carracteres!\n");
+            }
+            if (strlen(nome) < 3)
+            {
+                erro = 1;
+                printf("ERRO: O nome deve possuir pelo menos 3 (três) carracteres!\n");
+            }
+
+        } while (erro == 1);
+
+        do
+        {
+            erro = 0;
+
+            printf("*Digite a senha: ");
+            scanf(" %9[^\n]", senha);
+            fflush(stdin);
+
+            if (strlen(senha) > 9)
+            {
+                erro = 1;
+                printf("ERRO: A senha pode possuir no máximo 9 carracteres!\n");
+            }
+            if (strlen(senha) < 4)
+            {
+                erro = 1;
+                printf("ERRO: A senha deve possuir pelo menos 4 carracteres!\n");
+            }
+        } while (erro == 1);
+
+        Cuidador cuidador;
+        cuidador.ocupado = 1;
+        strcpy(cuidador.nome, nome);
+        strcpy(cuidador.matricula, matricula);
+        strcpy(cuidador.senha, senha);
+        editar_cuidador_arquivo(cuidador);
+
+        printf("\nCuidador atualizado com sucesso! \n");
+        pausar();
     }
     else
     {
         printf("\nNão foi encontrado um cuidador com a matrícula informada!\n\n");
         pausar();
     }
-
-    int erro;
-    char nome[256];
-    int idade;
-    char sexo, strSexo[3];
-    char turma[10];
-    char informacoes[1000];
-
-    do
-    {
-        erro = 0;
-
-        printf("*Digite o nome: ");
-        scanf(" %255[^\n]", nome);
-        fflush(stdin);
-
-        if (strlen(nome) > 254)
-        {
-            erro = 1;
-            printf("ERRO: O nome pode possuir no máximo 254 carracteres!\n");
-        }
-        if (strlen(nome) < 3)
-        {
-            erro = 1;
-            printf("ERRO: O nome deve possuir pelo menos 3 (três) carracteres!\n");
-        }
-
-    } while (erro == 1);
-
-    do
-    {
-        erro = 0;
-
-        printf("*Digite a senha: ");
-        scanf(" %9[^\n]", senha);
-        fflush(stdin);
-
-        if (strlen(senha) > 9)
-        {
-            erro = 1;
-            printf("ERRO: A senha pode possuir no máximo 9 carracteres!\n");
-        }
-        if (strlen(senha) < 4)
-        {
-            erro = 1;
-            printf("ERRO: A senha deve possuir pelo menos 4 carracteres!\n");
-        }
-    } while (erro == 1);
-
-    Cuidador cuidador;
-    cuidador.ocupado = 1;
-    strcpy(cuidador.nome, nome);
-    strcpy(cuidador.matricula, matricula);
-    strcpy(cuidador.senha, senha);
-    editar_cuidador_arquivo(cuidador);
-
-    printf("\nCuidador atualizado com sucesso! \n");
-    pausar();
 }
 
 void tela_relatorio_cuidadores()
